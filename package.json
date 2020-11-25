@@ -36,9 +36,9 @@
     "typescript": "^4.0.5"
   },
   "author": "Mark Fulton",
-  "homepage": "",
+  "homepage": "https://github.com/mfulton26/react-fullstory-excluder",
   "license": "MIT",
-  "repository": "",
+  "repository": "git@github.com:mfulton26/react-fullstory-excluder.git",
   "keywords": [
     "react-component"
   ]
