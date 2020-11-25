@@ -49,4 +49,4 @@ React.useEffect(() => {
 | `ignoreCase` | `boolean` | `false` | specifies ignoring case when matching text in elements to exclude |
 
 [npm-badge]: https://img.shields.io/npm/v/npm-package.png?style=flat-square
-[npm]: https://www.npmjs.org/package/npm-package
+[npm]: https://www.npmjs.com/package/react-fullstory-excluder
