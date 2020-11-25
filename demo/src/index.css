@@ -1,0 +1,15 @@
+form {
+  display: table;
+}
+form > label {
+  display: table-row;
+  margin: 4px;
+}
+form > label > * {
+  display: table-cell;
+  margin: 8px;
+}
+
+.fs-exclude {
+  outline: 4px dashed orange;
+}
