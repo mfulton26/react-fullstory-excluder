@@ -2,6 +2,10 @@
 
 Get FullStory exclusion of sensitive data without the hassle of manually placing `fs-exclude` on every element yourself.
 
+## Limitations
+
+Does not work with the [new JSX Transform](https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html)… yet. 😀
+
 ## Getting Started
 
 You need to register a `FullStoryExcluder` at the base of your app. This allows `react-fullstory-excluder` to reliably inject `fs-exclude` class name throughout your app.
