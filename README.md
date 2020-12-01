@@ -1,7 +1,5 @@
 # react-fullstory-excluder
 
-[![npm package][npm-badge]][npm]
-
 Get FullStory exclusion of sensitive data without the hassle of manually placing `fs-exclude` on every element yourself.
 
 ## Getting Started
@@ -23,9 +21,15 @@ ReactDOM.render(
 );
 ```
 
+See also [`FullStoryExcluder` options](#fullstoryexcluder-options).
+
 ### Excluding elements that include certain text
 
 To exclude all usages of certain text throughout your app (e.g. PII) you can use `setExclusionStrings` wherever you have access to your data you want to exclude in FullStory:
+
+```jsx
+import { useFullStoryExcluder } from "react-fullstory-excluder";
+```
 
 ```jsx
 const { setExclusionStrings } = useFullStoryExcluder();
@@ -35,18 +39,32 @@ React.useEffect(() => {
 }, [setExclusionStrings, name, socialSecurityNumber, phoneNumber]);
 ```
 
+See also [`setExclusionStrings` options](#setexclusionstrings-options).
+
 ## `FullStoryExcluder` options
 
-| option             | type                            | default        | description                                                              |
-| ------------------ | ------------------------------- | -------------- | ------------------------------------------------------------------------ |
-| `className`        | `string`                        | `"fs-exclude"` | the `class` name to inject to exclude things in FullStory                |
-| `htmlFormElements` | `"all" \| "freeform" \| "none"` | `"freeform"`   | which elements to exclude in FullStory regardless of their content/value |
+### `className`
+
+the `class` name to inject to exclude things in FullStory
+
+type: `string`
+
+default: `"fs-exclude"`
+
+### `htmlFormElements`
+
+which elements to automatically exclude in FullStory
+
+type: `"all" | "freeform" | "none" = "freeform"`
+
+default: `"freeform"`
 
 ## `setExclusionStrings` options
 
-| option       | type      | default | description                                                       |
-| ------------ | --------- | ------- | ----------------------------------------------------------------- |
-| `ignoreCase` | `boolean` | `false` | specifies ignoring case when matching text in elements to exclude |
+### `ignoreCase`
 
-[npm-badge]: https://img.shields.io/npm/v/npm-package.png?style=flat-square
-[npm]: https://www.npmjs.com/package/react-fullstory-excluder
+specifies ignoring case when matching text in elements to exclude
+
+type: `boolean`
+
+default: `false`
