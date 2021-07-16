@@ -55,6 +55,14 @@ type: `string`
 
 default: `"fs-exclude"`
 
+### `ignoreClassName`
+
+space delimited list of `class` names to check for before injecting; if any of the `class` names are present then the excluding [`className`](#classname) will not be injected
+
+type: `string`
+
+default: `"fs-unmask"`
+
 ### `htmlFormElements`
 
 which elements to automatically exclude in FullStory

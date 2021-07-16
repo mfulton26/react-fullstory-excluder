@@ -2,6 +2,8 @@ import escapeStringRegexp from "escape-string-regexp";
 
 import { ExclusionPredicate } from "./ExclusionPredicate";
 
+const whitespaceRegExp = /s+/;
+
 const nonePredicate: ExclusionPredicate = () => false;
 
 const none = (): ExclusionPredicate => nonePredicate;
@@ -69,10 +71,20 @@ const htmlFormElements = ({
   }
 };
 
-const or = (
-  a: ExclusionPredicate,
-  b: ExclusionPredicate
-): ExclusionPredicate => (...args) => a(...args) || b(...args);
+const and =
+  (a: ExclusionPredicate, b: ExclusionPredicate): ExclusionPredicate =>
+  (...args) =>
+    a(...args) && b(...args);
+
+const or =
+  (a: ExclusionPredicate, b: ExclusionPredicate): ExclusionPredicate =>
+  (...args) =>
+    a(...args) || b(...args);
+
+const not =
+  (predicate: ExclusionPredicate): ExclusionPredicate =>
+  (...args) =>
+    !predicate(...args);
 
 const strings = (
   texts: string[],
@@ -97,11 +109,28 @@ const strings = (
     );
 };
 
+const className = (className: string): ExclusionPredicate => {
+  const nonEmptyClassNames = className.split(whitespaceRegExp).filter(Boolean);
+  if (nonEmptyClassNames.length === 0) {
+    return none();
+  }
+  const regExp = new RegExp(
+    `^${nonEmptyClassNames.map((text) => escapeStringRegexp(text)).join("|")}$`
+  );
+  return (_type, props) => {
+    const { className = "" } = (props ?? {}) as { className?: string };
+    return className.split(whitespaceRegExp).some((name) => regExp.test(name));
+  };
+};
+
 const ExclusionPredicates = {
   none,
   htmlFormElements,
+  and,
   or,
+  not,
   strings,
+  className,
 };
 
 export default ExclusionPredicates;

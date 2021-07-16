@@ -27,12 +27,14 @@ export const useFullStoryExcluder = () => useContext(Context);
 
 export type FullStoryExcluderProps = {
   className?: string;
+  ignoreClassName?: string;
   htmlFormElements?: "all" | "freeform" | "none";
   children: () => ReactNode;
 };
 
 export default function FullStoryExcluder({
   className: fsExcludeClassName = "fs-exclude",
+  ignoreClassName = "fs-unmask",
   htmlFormElements = "freeform",
   children: renderChildren,
 }: FullStoryExcluderProps) {
@@ -44,7 +46,10 @@ export default function FullStoryExcluder({
 
   useEffect(() => {
     setPredicate(() =>
-      ExclusionPredicates.htmlFormElements({ group: htmlFormElements })
+      ExclusionPredicates.and(
+        ExclusionPredicates.not(ExclusionPredicates.className(ignoreClassName)),
+        ExclusionPredicates.htmlFormElements({ group: htmlFormElements })
+      )
     );
   }, [htmlFormElements]);
 
@@ -52,11 +57,16 @@ export default function FullStoryExcluder({
     () => ({
       setExclusionStrings: (strings, options) => {
         setPredicate(() =>
-          ExclusionPredicates.or(
-            ExclusionPredicates.htmlFormElements({
-              group: htmlFormElements,
-            }),
-            ExclusionPredicates.strings(strings, options)
+          ExclusionPredicates.and(
+            ExclusionPredicates.not(
+              ExclusionPredicates.className(ignoreClassName)
+            ),
+            ExclusionPredicates.or(
+              ExclusionPredicates.htmlFormElements({
+                group: htmlFormElements,
+              }),
+              ExclusionPredicates.strings(strings, options)
+            )
           )
         );
       },
