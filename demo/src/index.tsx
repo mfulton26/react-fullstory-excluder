@@ -8,6 +8,7 @@ const Demo = () => {
   const [name, setName] = React.useState("");
   const [age, setAge] = React.useState("");
   const [bio, setBio] = React.useState("");
+  const [unmaskedText, setUnmaskedText] = React.useState("I can see you!");
   const [ignoreCase, setIgnoreCase] = React.useState(true);
 
   const { setExclusionStrings } = useFullStoryExcluder();
@@ -45,6 +46,16 @@ const Demo = () => {
               onChange={({ target: { value } }) => setBio(value)}
             />
             <output>Bio: {bio}</output>
+          </label>
+          <label>
+            <span>Unmasked</span>
+            <input
+              className="fs-unmask"
+              type="text"
+              value={unmaskedText}
+              onChange={({ target: { value } }) => setUnmaskedText(value)}
+            />
+            <output className="fs-unmask">Unmasked: {unmaskedText}</output>
           </label>
         </form>
       </main>
