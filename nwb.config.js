@@ -10,8 +10,15 @@ module.exports = {
     },
   },
   webpack: {
+    config: (config) => {
+      if (config.mode === "development") {
+        config.entry = "./demo/src/index.tsx";
+      } else {
+        config.entry = "./src/index.tsx";
+      }
+      return config;
+    },
     extra: {
-      entry: "./src/index.tsx",
       resolve: {
         extensions: [".ts", ".tsx", ".js", ".jsx"],
       },
