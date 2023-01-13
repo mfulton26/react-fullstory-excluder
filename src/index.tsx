@@ -43,35 +43,39 @@ export default function FullStoryExcluder({
   const [predicate, setPredicate] = useState<ExclusionPredicate>(() =>
     ExclusionPredicates.none()
   );
+  const [stringsExclusionPredicate, setStringsExclusionPredicate] =
+    useState<ExclusionPredicate>();
 
   useEffect(() => {
+    const classNameExclusionPredicate = ExclusionPredicates.not(
+      ExclusionPredicates.className(ignoreClassName)
+    );
+    const htmlFormElementsExclusionPredicate =
+      ExclusionPredicates.htmlFormElements({
+        group: htmlFormElements,
+      });
     setPredicate(() =>
       ExclusionPredicates.and(
-        ExclusionPredicates.not(ExclusionPredicates.className(ignoreClassName)),
-        ExclusionPredicates.htmlFormElements({ group: htmlFormElements })
+        classNameExclusionPredicate,
+        stringsExclusionPredicate === undefined
+          ? htmlFormElementsExclusionPredicate
+          : ExclusionPredicates.or(
+              htmlFormElementsExclusionPredicate,
+              stringsExclusionPredicate
+            )
       )
     );
-  }, [htmlFormElements]);
+  }, [htmlFormElements, ignoreClassName, stringsExclusionPredicate]);
 
   const context: ContextProps = useMemo(
     () => ({
       setExclusionStrings: (strings, options) => {
-        setPredicate(() =>
-          ExclusionPredicates.and(
-            ExclusionPredicates.not(
-              ExclusionPredicates.className(ignoreClassName)
-            ),
-            ExclusionPredicates.or(
-              ExclusionPredicates.htmlFormElements({
-                group: htmlFormElements,
-              }),
-              ExclusionPredicates.strings(strings, options)
-            )
-          )
+        setStringsExclusionPredicate(() =>
+          ExclusionPredicates.strings(strings, options)
         );
       },
     }),
-    [htmlFormElements]
+    []
   );
 
   const proxyHandler = useMemo(() => {
