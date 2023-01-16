@@ -12,40 +12,19 @@ You need to register a `FullStoryExcluder` at the base of your app. This allows 
 
 ### Registration
 
-Wrap your `App` component with `FullStoryExcluder`:
-
-```jsx
-import React from "react";
-import ReactDOM from "react-dom";
-import { FullStoryExcluder } from "react-fullstory-excluder";
-
-ReactDOM.render(
-  <FullStoryExcluder>{() => <App />}</FullStoryExcluder>,
-  document.getElementById("root")
-);
-```
-
-See also [`FullStoryExcluder` options](#fullstoryexcluder-options).
-
-### Excluding elements that include certain text
-
-To exclude all usages of certain text throughout your app (e.g. PII) you can use `setExclusionStrings` wherever you have access to your data you want to exclude in FullStory:
+Call the hook from any component in your app:
 
 ```jsx
 import { useFullStoryExcluder } from "react-fullstory-excluder";
+
+function SomeComponent() {
+  useFullStoryExcluder();
+
+  return <>some content</>;
+}
 ```
 
-```jsx
-const { setExclusionStrings } = useFullStoryExcluder();
-
-React.useEffect(() => {
-  setExclusionStrings([name, socialSecurityNumber, phoneNumber]);
-}, [setExclusionStrings, name, socialSecurityNumber, phoneNumber]);
-```
-
-See also [`setExclusionStrings` options](#setexclusionstrings-options).
-
-## `FullStoryExcluder` options
+## `useFullStoryExcluder` options
 
 ### `className`
 
@@ -67,13 +46,19 @@ default: `"fs-unmask"`
 
 which elements to automatically exclude in FullStory
 
-type: `"all" | "freeform" | "none" = "freeform"`
+type: `"all" | "freeform" | "none"`
 
 default: `"freeform"`
 
-## `setExclusionStrings` options
+### `exclusionStrings`
 
-### `ignoreCase`
+which strings to automatically exclude in FullStory
+
+type: `string[]`
+
+default: `[]`
+
+### `exclusionStringsIgnoreCase`
 
 specifies ignoring case when matching text in elements to exclude
 

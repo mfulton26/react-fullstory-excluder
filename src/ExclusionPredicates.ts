@@ -1,6 +1,10 @@
+import type React from "react";
+
 import escapeStringRegexp from "escape-string-regexp";
 
-import { ExclusionPredicate } from "./ExclusionPredicate";
+export type ExclusionPredicate = (
+  ...argumentsList: Parameters<typeof React.createElement>
+) => boolean;
 
 const whitespaceRegExp = /s+/;
 

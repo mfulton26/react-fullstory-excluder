@@ -2,7 +2,7 @@ import React from "react";
 import { render } from "react-dom";
 import "./index.css";
 
-import FullStoryExcluder, { useFullStoryExcluder } from "../../src";
+import { useFullStoryExcluder } from "../../src";
 
 const Demo = () => {
   const [name, setName] = React.useState("");
@@ -11,11 +11,11 @@ const Demo = () => {
   const [unmaskedText, setUnmaskedText] = React.useState("I can see you!");
   const [ignoreCase, setIgnoreCase] = React.useState(true);
 
-  const { setExclusionStrings } = useFullStoryExcluder();
-
-  React.useEffect(() => {
-    setExclusionStrings([name], { ignoreCase });
-  }, [setExclusionStrings, name, ignoreCase]);
+  useFullStoryExcluder({
+    htmlFormElements: "freeform",
+    exclusionStrings: [name],
+    exclusionStringsIgnoreCase: ignoreCase,
+  });
 
   return (
     <div className="App">
@@ -77,14 +77,7 @@ const Demo = () => {
 
 render(
   <React.StrictMode>
-    <FullStoryExcluder htmlFormElements="freeform">
-      {() => (
-        <div>
-          <h1>react-fullstory-excluder Demo</h1>
-          <Demo />
-        </div>
-      )}
-    </FullStoryExcluder>
+    <Demo />
   </React.StrictMode>,
   document.querySelector("#demo")
 );

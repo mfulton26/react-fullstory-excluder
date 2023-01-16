@@ -1,52 +1,33 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { useClassNameInjectingApplyTrap } from "./classNameInjectingApplyTrap";
-import { useForceUpdate } from "./forceUpdate";
-import { ExclusionPredicate } from "./ExclusionPredicate";
+import React from "react";
 
 import ExclusionPredicates from "./ExclusionPredicates";
-
-type ContextProps = {
-  setExclusionStrings: (
-    strings: string[],
-    { ignoreCase }: { ignoreCase?: boolean }
-  ) => void;
-};
-
-const Context = createContext<ContextProps>({
-  setExclusionStrings: () => {},
-});
-
-export const useFullStoryExcluder = () => useContext(Context);
+import { setHandler, deleteHandler } from "./proxyHandler";
 
 export type FullStoryExcluderProps = {
   className?: string;
   ignoreClassName?: string;
   htmlFormElements?: "all" | "freeform" | "none";
-  children: () => ReactNode;
+  exclusionStrings?: string[];
+  exclusionStringsIgnoreCase?: boolean;
+  children?: React.ReactNode;
 };
 
-export default function FullStoryExcluder({
-  className: fsExcludeClassName = "fs-exclude",
+export function useFullStoryExcluder({
+  className: classNameToInject = "fs-exclude",
   ignoreClassName = "fs-unmask",
   htmlFormElements = "freeform",
-  children: renderChildren,
-}: FullStoryExcluderProps) {
-  const forceUpdate = useForceUpdate();
+  exclusionStrings = [],
+  exclusionStringsIgnoreCase = false,
+}: FullStoryExcluderProps = {}) {
+  const [proxyHandlerId] = React.useState(Object.create(null));
 
-  const [predicate, setPredicate] = useState<ExclusionPredicate>(() =>
-    ExclusionPredicates.none()
-  );
-  const [stringsExclusionPredicate, setStringsExclusionPredicate] =
-    useState<ExclusionPredicate>();
+  const stringifiedExclusionStrings = JSON.stringify(exclusionStrings);
 
-  useEffect(() => {
+  const predicate = React.useMemo(() => {
+    console.log("recomputing predicate");
+
+    const exclusionStrings = JSON.parse(stringifiedExclusionStrings);
+
     const classNameExclusionPredicate = ExclusionPredicates.not(
       ExclusionPredicates.className(ignoreClassName)
     );
@@ -54,50 +35,27 @@ export default function FullStoryExcluder({
       ExclusionPredicates.htmlFormElements({
         group: htmlFormElements,
       });
-    setPredicate(() =>
-      ExclusionPredicates.and(
-        classNameExclusionPredicate,
-        stringsExclusionPredicate === undefined
-          ? htmlFormElementsExclusionPredicate
-          : ExclusionPredicates.or(
-              htmlFormElementsExclusionPredicate,
-              stringsExclusionPredicate
-            )
+
+    const stringsExclusionPredicate = ExclusionPredicates.strings(
+      exclusionStrings,
+      { ignoreCase: exclusionStringsIgnoreCase }
+    );
+
+    return ExclusionPredicates.and(
+      classNameExclusionPredicate,
+      ExclusionPredicates.or(
+        htmlFormElementsExclusionPredicate,
+        stringsExclusionPredicate
       )
     );
-  }, [htmlFormElements, ignoreClassName, stringsExclusionPredicate]);
+  }, [
+    stringifiedExclusionStrings,
+    exclusionStringsIgnoreCase,
+    htmlFormElements,
+    ignoreClassName,
+  ]);
 
-  const context: ContextProps = useMemo(
-    () => ({
-      setExclusionStrings: (strings, options) => {
-        setStringsExclusionPredicate(() =>
-          ExclusionPredicates.strings(strings, options)
-        );
-      },
-    }),
-    []
-  );
+  setHandler(proxyHandlerId, { classNameToInject, predicate });
 
-  const proxyHandler = useMemo(() => {
-    const result: ProxyHandler<typeof React.createElement> = {};
-    React.createElement = new Proxy(React.createElement, result);
-    return result;
-  }, []);
-
-  const applyTrap = useClassNameInjectingApplyTrap(
-    predicate,
-    fsExcludeClassName
-  );
-
-  useEffect(() => {
-    proxyHandler.apply = applyTrap;
-    forceUpdate();
-    return () => {
-      delete proxyHandler.apply;
-    };
-  }, [proxyHandler, applyTrap, forceUpdate]);
-
-  return (
-    <Context.Provider value={context}>{renderChildren()}</Context.Provider>
-  );
+  React.useEffect(() => () => deleteHandler(proxyHandlerId), [proxyHandlerId]);
 }
