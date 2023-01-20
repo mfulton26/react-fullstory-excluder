@@ -22,23 +22,18 @@ export function useFullStoryExcluder({
 
   const stringifiedExclusionStrings = JSON.stringify(exclusionStrings);
 
-  // track exclusion strings that were recently changed so that while React re-renders
-  // we still exclude recent "prior" strings properly until re-rendering is complete
   const [
-    stringifiedExclusionStringsInState,
-    setStringifiedExclusionStringsInState,
+    delayedStringifiedExclusionStrings,
+    setDelayedStringifiedExclusionStrings,
   ] = useState<string>(stringifiedExclusionStrings);
-  useEffect(() => {
-    setStringifiedExclusionStringsInState(stringifiedExclusionStrings);
-  }, [stringifiedExclusionStrings]);
 
   const predicate = React.useMemo(() => {
     const exclusionStrings: string[] = JSON.parse(stringifiedExclusionStrings);
 
-    if (stringifiedExclusionStringsInState !== stringifiedExclusionStrings) {
+    if (delayedStringifiedExclusionStrings !== stringifiedExclusionStrings) {
       // merge previous/current exclusion strings during re-rendering
       const seen = new Set(exclusionStrings);
-      JSON.parse(stringifiedExclusionStringsInState).forEach(
+      JSON.parse(delayedStringifiedExclusionStrings).forEach(
         (string: string) => {
           if (seen.has(string)) {
             return;
@@ -71,12 +66,21 @@ export function useFullStoryExcluder({
     );
   }, [
     stringifiedExclusionStrings,
+    delayedStringifiedExclusionStrings,
     exclusionStringsIgnoreCase,
     htmlFormElements,
     ignoreClassName,
   ]);
 
   setHandler(proxyHandlerId, { classNameToInject, predicate });
+
+  useEffect(() => {
+    const timeoutId = setTimeout(
+      () => setDelayedStringifiedExclusionStrings(stringifiedExclusionStrings),
+      0
+    );
+    return () => clearTimeout(timeoutId);
+  }, [stringifiedExclusionStrings]);
 
   React.useEffect(() => () => deleteHandler(proxyHandlerId), [proxyHandlerId]);
 }
