@@ -1,6 +1,6 @@
 {
   "name": "react-fullstory-excluder",
-  "version": "3.1.0-beta.2",
+  "version": "3.1.0",
   "description": "react-fullstory-excluder React component",
   "main": "lib/index.js",
   "module": "es/index.js",
